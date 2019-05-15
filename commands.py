@@ -1,7 +1,7 @@
 from MALMan import app
 import MALMan.database as DB
 
-from flask.ext.script import Manager
+from flask_script import Manager
 from flask_security.utils import encrypt_password
 
 from datetime import date

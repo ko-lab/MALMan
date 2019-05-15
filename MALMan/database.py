@@ -2,14 +2,16 @@
 
 from MALMan import app
 from flask_security import SQLAlchemyUserDatastore, UserMixin, RoleMixin
+
 try:
-    from flask.ext.sqlalchemy import SQLAlchemy
+    from flask_sqlalchemy import SQLAlchemy
 except ImportError:
     from flask_sqlalchemy import SQLAlchemy
 import datetime
 
 from sqlalchemy import and_, or_
 from sqlalchemy.ext.hybrid import hybrid_property
+
 
 def _date_to_datetime(date):
     '''Convert a date object to a datetime object
@@ -23,8 +25,8 @@ def _date_to_datetime(date):
 db = SQLAlchemy(app)
 
 roles_users = db.Table('members_roles_users',
-        db.Column('user_id', db.Integer(), db.ForeignKey('members.id')),
-        db.Column('role_id', db.Integer(), db.ForeignKey('members_roles.id')))
+                       db.Column('user_id', db.Integer(), db.ForeignKey('members.id')),
+                       db.Column('role_id', db.Integer(), db.ForeignKey('members_roles.id')))
 
 
 class Role(db.Model, RoleMixin):
@@ -61,7 +63,7 @@ class User(db.Model, UserMixin):
     motivation = db.Column(db.Text())
     confirmed_at = db.Column(db.Date())
     roles = db.relationship('Role', secondary=roles_users,
-        backref=db.backref('Roleusers', lazy='dynamic'))
+                            backref=db.backref('Roleusers', lazy='dynamic'))
 
     def __str__(self):
         return '<User id=%s email=%s>' % (self.id, self.email)
@@ -78,39 +80,23 @@ class User(db.Model, UserMixin):
 
     @property
     def membership_due(self):
-    	for item in self.Membership_Fee:
-    	    #This will only be excecuted once, but this replaces a complicated if-construction
+        for item in self.Membership_Fee:
+            # This will only be excecuted once, but this replaces a complicated if-construction
             return item.until
         return "0000-00-00"
 
-    @hybrid_property
     def active_member(self):
         '''Whether the user is a member at the moment.
         This function is used when the propery is called through User.active_member'''
         start = self.membership_start
         end = self.membership_end
         if start:
-            if end and start < end:
+            if end is not None and start < end:
                 return False
             if start <= datetime.date.today():
                 return True
         return False
 
-    @active_member.expression
-    def active_member_sql(member):
-        '''Whether the user is a member at the moment.
-        This function is used when the propery is called by sqlalchemy functions such as filter()'''
-        start = member.membership_start
-        end = member.membership_end
-        is_member = and_(
-            start != None,
-            start <= datetime.date.today(),
-            or_(
-                end == None,
-                end < start
-            )
-        )
-        return is_member
 
 user_datastore = SQLAlchemyUserDatastore(db, User, Role)
 
@@ -120,7 +106,8 @@ class MembershipFee(db.Model):
     __tablename__ = 'members_fees'
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('members.id'))
-    user = db.relationship('User', backref=db.backref("Membership_Fee", order_by="desc(MembershipFee.until)"), lazy="joined")
+    user = db.relationship('User', backref=db.backref("Membership_Fee", order_by="desc(MembershipFee.until)"),
+                           lazy="joined")
     transaction_id = db.Column(db.Integer, db.ForeignKey('accounting_transactions.id'))
     transaction = db.relationship('Transaction')
     until = db.Column(db.Date())
@@ -230,43 +217,45 @@ class AccountingAttachment(db.Model):
 
 
 attachments_transactions = db.Table('accounting_attachments_transactions',
-        db.Column('attachment_id', db.Integer(), db.ForeignKey('accounting_attachments.id')),
-        db.Column('transaction_id', db.Integer(), db.ForeignKey('accounting_transactions.id')))
+                                    db.Column('attachment_id', db.Integer(),
+                                              db.ForeignKey('accounting_attachments.id')),
+                                    db.Column('transaction_id', db.Integer(),
+                                              db.ForeignKey('accounting_transactions.id')))
 
 
 class Transaction(db.Model):
     """Define the transactions database table"""
     __tablename__ = 'accounting_transactions'
     id = db.Column(db.Integer, primary_key=True)
-        # Could be used to tag (paper, or scanned) receipts to transactions.
+    # Could be used to tag (paper, or scanned) receipts to transactions.
     date = db.Column(db.Date())
-        # date the bank transaction took place
+    # date the bank transaction took place
     advance_date = db.Column(db.Date())
-        # only applicable if the money was advanced
+    # only applicable if the money was advanced
     facturation_date = db.Column(db.Date())
-        # same as 'date' if there is no invoice
+    # same as 'date' if there is no invoice
     is_revenue = db.Column(db.Boolean())
     amount = db.Column(db.Numeric(11, 2))
-        # positive is it is a revenue, negative if it's an expense
+    # positive is it is a revenue, negative if it's an expense
     to_from = db.Column(db.String(256))
-        # the second party involved in the transaction
+    # the second party involved in the transaction
     category_id = db.Column(db.Integer, db.ForeignKey('accounting_categories.id'))
-        # which kind of revenue or expense the transaction is
+    # which kind of revenue or expense the transaction is
     category = db.relationship("AccountingCategory")
     description = db.Column(db.Text)
     bank_id = db.Column(db.Integer, db.ForeignKey('accounting_banks.id'))
-        # the bankaccount involved. cash transactions are considered an account too (id=99)
+    # the bankaccount involved. cash transactions are considered an account too (id=99)
     bank = db.relationship("Bank", backref="Transaction", lazy="joined")
     bank_statement_number = db.Column(db.Integer)
-        # number in the bank's account statements
+    # number in the bank's account statements
     date_filed = db.Column(db.Date())
-        # if it is a reimbursement this is the date the request was approved
+    # if it is a reimbursement this is the date the request was approved
     filed_by_id = db.Column(db.Integer, db.ForeignKey('members.id'))
-        # if it is a reimbursement this is the user that approved the request
+    # if it is a reimbursement this is the user that approved the request
     filed_by = db.relationship('User')
     reimbursement_comments = db.Column(db.Text)
     attachments = db.relationship('AccountingAttachment', secondary=attachments_transactions,
-        backref=db.backref('transactions', lazy='dynamic'))
+                                  backref=db.backref('transactions', lazy='dynamic'))
 
 
 class BarAccountLog(db.Model):

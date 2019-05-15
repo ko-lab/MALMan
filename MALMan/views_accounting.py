@@ -5,8 +5,8 @@ from MALMan.view_utils import (add_confirmation, return_flash, accounting_catego
                                membership_required, Pagination, upload_attachments, string_to_date)
 
 from flask import render_template, request, redirect, flash, abort, url_for, send_file
-from flask.ext.login import current_user
-from flask.ext.uploads import UploadSet, configure_uploads
+from flask_login import current_user
+from flask_uploads import UploadSet, configure_uploads
 from datetime import date, timedelta
 
 attachments = UploadSet(name='attachments')

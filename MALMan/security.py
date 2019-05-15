@@ -2,9 +2,9 @@ from MALMan import app
 import MALMan.database as DB
 from flask_security import Security
 from flask import session
-from flask.ext.principal import Principal
-from flask.ext.mail import Mail
-from flask.ext.login import current_user
+from flask_principal import Principal
+from flask_mail import Mail
+from flask_login import current_user
 
 # configuration
 app.config['SECURITY_REGISTERABLE'] = True

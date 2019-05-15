@@ -1,0 +1,24 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+
+[packages]
+flup = "*"
+requests = "*"
+Flask = "*"
+Flask-BasicAuth = "*"
+Flask-Login = "*"
+Flask-Mail = "*"
+Flask-Principal = "*"
+Flask-Script = "*"
+Flask-Security = "*"
+Flask-SQLAlchemy = "*"
+Flask-Uploads = "*"
+Flask-WTF = "*"
+SQLAlchemy = "*"
+
+[requires]
+python_version = "3.7"

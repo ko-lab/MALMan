@@ -3,7 +3,7 @@ import MALMan.database as DB
 
 from flask import Response, request
 from flask_security.utils import verify_and_update_password
-from flask.ext.basicauth import BasicAuth
+from flask_basicauth import BasicAuth
 
 import json
 from datetime import datetime

@@ -2,11 +2,11 @@ from MALMan import app
 import MALMan.database as DB
 
 from flask import request, flash, abort, url_for, current_app
-from flask.ext.principal import Permission, RoleNeed
-from flask.ext.login import current_user
+from flask_principal import Permission, RoleNeed
+from flask_login import current_user
 
 from functools import wraps
-from urlparse import urlparse
+from urllib.parse import urlparse
 from math import ceil
 import datetime
 
@@ -45,10 +45,11 @@ def accounting_categories(IN=True, OUT=True):
 
 def membership_required():
     '''Check if a user is logged in and a member. If not, redirrect to login page or display an error'''
+
     def wrapper(fn):
         @wraps(fn)
         def decorated_view(*args, **kwargs):
-            if not current_user.is_authenticated():
+            if not current_user.is_authenticated:
                 return current_app.login_manager.unauthorized()
             if not current_user.active_member:
                 start = current_user.membership_start
@@ -62,16 +63,19 @@ def membership_required():
                     flash('You need to be aproved as a member to access this resource', 'error')
                 abort(403)
             return fn(*args, **kwargs)
+
         return decorated_view
+
     return wrapper
 
 
 def permission_required(*roles):
     '''Check if a user had one or more permission roles. For this the user must be logged in and a member.'''
+
     def wrapper(fn):
         @wraps(fn)
         def decorated_view(*args, **kwargs):
-            if not current_user.is_authenticated():
+            if not current_user.is_authenticated:
                 return current_app.login_manager.unauthorized()
             if not current_user.active_member:
                 flash('You need to be aproved as a member to access this resource', 'error')
@@ -82,7 +86,9 @@ def permission_required(*roles):
                           '\' to access this resource.', 'error')
                     abort(403)
             return fn(*args, **kwargs)
+
         return decorated_view
+
     return wrapper
 
 
@@ -109,9 +115,9 @@ class Pagination(object):
         last = 0
         for num in xrange(1, self.pages + 1):
             if num <= left_edge or \
-               (num > self.page - left_current - 1 and
-                num < self.page + right_current) or \
-               num > self.pages - right_edge:
+                    (num > self.page - left_current - 1 and
+                     num < self.page + right_current) or \
+                    num > self.pages - right_edge:
                 if last + 1 != num:
                     yield None
                 yield num
@@ -125,6 +131,8 @@ def url_for_other_page(page):
     url = url_for(request.endpoint, **args)
     query = '?' + urlparse(request.url).query
     return url + query
+
+
 app.jinja_env.globals['url_for_other_page'] = url_for_other_page
 
 
