@@ -1,11 +1,11 @@
-Installation [![Build Status](https://travis-ci.org/voidwarranties/MALMan.svg?branch=master)](https://travis-ci.org/voidwarranties/MALMan) [![Requirements Status](https://requires.io/github/voidwarranties/MALMan/requirements.png?branch=master)](https://requires.io/github/voidwarranties/MALMan/requirements/?branch=master)
+Installation [![Build Status](https://travis-ci.org/ko-lab/MALMan.svg?branch=master)](https://travis-ci.org/ko-lab/MALMan) [![Requirements Status](https://requires.io/github/ko-lab/MALMan/requirements.svg?branch=master)](https://requires.io/github/ko-lab/MALMan/requirements/?branch=master)
 ============
 
 ## Setting up a development environment using vagrant and ansible.
 
 Get the source code.
 
-    git clone git://github.com/voidwarranties/MALMan.git
+    git clone git://github.com/ko-lab/MALMan.git
 
 Install vagrant, virtualbox and ansible.
 You can now create a development environment in a virtual machine by executing `vagrant up`.
@@ -44,7 +44,7 @@ In debug mode the app will auto-reload when source files change and an interacti
 
 Create a directory to contain the program and get the source code:
 
-    git clone git://github.com/voidwarranties/MALMan.git /var/www/MALMan
+    git clone git://github.com/ko-lab/MALMan.git /var/www/MALMan
 
 From here on on I will assume you are located in the directory you installed MALMan in,
 so move into this directory.
